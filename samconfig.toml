@@ -1,0 +1,8 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "aws-sam-docker-compose-exampl"
+s3_bucket = "aws-sam-resources"
+s3_prefix = "aws-sam-docker-compose-exampl"
+capabilities = "CAPABILITY_IAM"

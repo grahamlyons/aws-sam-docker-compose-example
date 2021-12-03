@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Transform:
+  - AWS::Serverless-2016-10-31
+
+Parameters:
+  TableName:
+    Type: String
+    Default: example
+
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    Timeout: 10
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref TableName
+        DYNAMODB_ENDPOINT: ""
+
+Resources:
+  indexFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.rootHandler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+
+  addMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/handlers/index.addMessageHandler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableName
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+
+  DbTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      AttributeDefinitions:
+        - AttributeName: "pk"
+          AttributeType: "S"
+        - AttributeName: "sk"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "pk"
+          KeyType: "HASH"
+        - AttributeName: "sk"
+          KeyType: "RANGE"
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  WebEndpoint:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

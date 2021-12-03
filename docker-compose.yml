@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  acceptance-test:
+    build: .
+    environment:
+      TABLE_NAME: example
+      DYNAMODB_ENDPOINT: http://dynamodb:8000/
+      API_BASE_URL: http://app:3000/
+    command: wait-for-it --strict --timeout=300 app:3000 -- npm run acceptance-test
+    depends_on:
+      - app
+  app:
+    build: .
+    environment:
+      TABLE_NAME: example
+      DYNAMODB_ENDPOINT: http://dynamodb:8000/
+      AWS_DEFAULT_REGION: eu-west-1
+      AWS_REGION: eu-west-1
+      AWS_ACCESS_KEY_ID: 1
+      AWS_SECRET_ACCESS_KEY: 1
+    working_dir: $PWD
+    command: wait-for-it --strict --timeout=30 dynamodb:8000 -- ./_start-api.sh
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - $PWD:$PWD
+    depends_on:
+      - dynamodb
+  dynamodb:
+    image: amazon/dynamodb-local
