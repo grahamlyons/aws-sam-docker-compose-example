@@ -17,3 +17,8 @@ This creates 3 containers:
  - the acceptance tests
 
 The container running the app has the Docker socket on the host machine mounted inside it, as well as the current directory so that the Sam containers have access to the code. There is a step before the app starts where the `node_modules` directory is copied into the working directory - this is ensure that the dependencies installed are for Linux rather than whatever the host OS is.
+
+
+### Infrastructure model
+
+![Infrastructure model](.infragenie/infrastructure_model.png)
